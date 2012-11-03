@@ -1,0 +1,28 @@
+
+Border Colors for Raster Time
+
+00 - Black - Background processing (ea31/ea81) and free time
+06 - Blue  - Network
+02 - Red   - Track Increment
+
+
+Fixed in 1.1
+
+ARP bug in LAN mode
+Screen clear on old kernals
+RUN-STOP to reset game 
+
+
+MEMORY MAP
+  0801 - BASIC program start
+  0810 - ML code start
+  08c0 - Car sprite Frame #1  offset $23  decimal 35
+  0900 - Car sprite Frame #2  offset $24  decimal 36
+  0940 - Car sprite Frame #3  offset $25  decimal 37
+  0980 - Explosion sprites    offset $26 to $2e  (9 total)
+  0BC0 - Sprite offset $30 - blank
+  0C00 - Code continues...
+  1000 - Music       
+  2000 - Charset
+  2800 - Code continues...
+ ~3200 - Track
