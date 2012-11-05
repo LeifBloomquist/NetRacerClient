@@ -1,0 +1,60 @@
+NetRacer - A proof-of-concept networked multiplayer action game for the Commodore 64 with Ethernet cartridge.
+
+Supports any CS8900-based cart with the RR-Net mappings (RR-Net, FB-Net, 64NIC+, etc.)  Should also work on the ETH64 but we never tried it.  
+
+HUGE THANKS to Oliver "Six" VieBrooks for writing netlib64, and allowing me to include (slightly hacked) parts of it here in its unfinished, yet functional, state.  I also made liberal use of his many clever DASM macros.
+
+Just so appropriate blame can be levied, the filenames that are ALL CAPS (DHCP.ASM, etc.) are from the netlib, though the headers with the ASCII skulls are somewhat of a giveaway :-P   
+
+==================================================
+
+As presented here, this is targeted for building on Windows.  DASM (dasm.exe) from http://dasm-dillon.sourceforge.net/ is provided to get you started quickly.  Just type 'make' [1].  Should be pretty easy to build under Linux or any other platform that DASM runs on though. 
+
+The output file is prefixed by a ! to flag it as the main loader file on an IDE64.  This is optional.
+
+==================================================
+
+I needed a lot of help with this effort, so huge thanks to:
+
+GRAPHICS and CODE FIXES: Robin Harbron with some code from Lassi Oorni.
+
+NETWORK CODE: Again, Oliver "Six" VieBrooks, without whom this game wouldn't have been possible at all.
+
+SPRITES: Raymond Lejuez
+
+MUSIC: "SpeedRoad" by Alexander Rotzsch (http://noname.c64.org/csdb/sid/?id=12177)
+
+PLAYTESTERS: Robin Harbron, Dave McMurtrie, and Dave Hartman
+
+SERVER HOSTING: Ian Colquhoun
+
+(The server code itself is Java and is available at 
+http://github.com/LeifBloomquist/NetRacerServer )  
+
+Plus I borrowed bits of code from many others, see the source, I tried to document very instance.
+
+==================================================
+
+Look in the 'docs' directory for presentations, working documentation, and even a copy of the poster! 
+
+==================================================
+
+Client Issues:  Numerous.  
+
+-There is a lot of dead code, especially from the netlib.  (I just imported everything)
+
+-Checksums were never implemented.
+
+-The protocol allows for much more advanced physics than is currently used i.e. the cars' velocities are all transmitted.  But Robin's approach is still very playable, maybe we'll revisit this in the future.
+
+-Sound effects don't retrigger properly.
+
+-The game is pretty lame.  The scrolling is way too slow.  And once the players get spaced out on the track, they almost never interact.
+
+-The code's a mess.  Sometimes things are in a weird place to be more efficient with memory.
+
+-And more.
+
+==================================================
+
+[1] Not a real makefile by any stretch of the imagination!  
