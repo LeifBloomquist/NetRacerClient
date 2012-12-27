@@ -16,7 +16,7 @@ The output file is prefixed by a ! to flag it as the main loader file on an IDE6
 
 I needed a lot of help with this effort, so huge thanks to:
 
-GRAPHICS and CODE FIXES: Robin Harbron with some code from Lassi Oorni.
+GRAPHICS and CODE FIXES: Robin Harbron with some code from Lasse Oorni.
 
 NETWORK CODE: Again, Oliver "Six" VieBrooks, without whom this game wouldn't have been possible at all.
 
