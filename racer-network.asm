@@ -2,20 +2,19 @@
 ; Network stuff for racing game
 
 CARD_MAC	 dc.b $00,$80,$10,$0c,$64,$01
-CARD_IP		 dc.b 192,168,7,64
+CARD_IP		 dc.b 192,168,1,64
 CARD_MASK	 dc.b 255,255,255,0
-CARD_GATE	 dc.b 192,168,7,1
+CARD_GATE	 dc.b 192,168,1,1
 CARD_GATE_MAC	dc.b $00,$00,$00,$00,$00,$00
 
 SERVER_IP
-  .byte 142,55,243,46    ; Public
+  .byte 208,79,218,201    ; Public
 
 SERVER_IP_LAN  
   .byte 192,168,7,100     ; Private
   
 ; Default,  overwritten by ARP
 SERVER_MAC
-  ;.byte $00,$15,$C5,$5C,$CF,$24  ; (Leif's Dell Laptop)
   .byte $01,$02,$03,$04,$05,$06
   
 

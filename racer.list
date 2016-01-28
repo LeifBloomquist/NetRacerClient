@@ -3304,504 +3304,503 @@
       2  5e33							; Network stuff for racing game
       3  5e33
       4  5e33		       00 80 10 0c*CARD_MAC   dc.b	$00,$80,$10,$0c,$64,$01
-      5  5e39		       c0 a8 07 40 CARD_IP    dc.b	192,168,7,64
+      5  5e39		       c0 a8 01 40 CARD_IP    dc.b	192,168,1,64
       6  5e3d		       ff ff ff 00 CARD_MASK  dc.b	255,255,255,0
-      7  5e41		       c0 a8 07 01 CARD_GATE  dc.b	192,168,7,1
+      7  5e41		       c0 a8 01 01 CARD_GATE  dc.b	192,168,1,1
       8  5e45		       00 00 00 00*CARD_GATE_MAC dc.b	$00,$00,$00,$00,$00,$00
       9  5e4b
      10  5e4b				   SERVER_IP
-     11  5e4b		       8e 37 f3 2e	      .byte.b	142,55,243,46	; Public
+     11  5e4b		       d0 4f da c9	      .byte.b	208,79,218,201	; Public
      12  5e4f
      13  5e4f				   SERVER_IP_LAN
      14  5e4f		       c0 a8 07 64	      .byte.b	192,168,7,100	; Private
      15  5e53
      16  5e53							; Default,  overwritten by ARP
      17  5e53				   SERVER_MAC
-     18  5e53							;.byte $00,$15,$C5,$5C,$CF,$24  ; (Leif's Dell Laptop)
-     19  5e53		       01 02 03 04*	      .byte.b	$01,$02,$03,$04,$05,$06
+     18  5e53		       01 02 03 04*	      .byte.b	$01,$02,$03,$04,$05,$06
+     19  5e59
      20  5e59
-     21  5e59
-     22  5e59		       0b b8	   USER_UDP_PORT =	3000
-     23  5e59
-     24  5e59		       8e 86	   UDP_DATA_IN equ	INPACKET+$2A	; Beginning of UDP data buffer
-     25  5e59
-     26  5e59							;Various Flags...
-     27  5e59
-     28  5e59				   PACKET_RECEIVED		; Flag for incoming data
-     29  5e59		       00		      .byte.b	$00
-     30  5e5a
-     31  5e5a				   NETSETUPFINISHED
-     32  5e5a		       00		      .byte.b	$00
-     33  5e5b
-     34  5e5b				   NETWORK_TIMEOUT		; Reset by packet receive.
-     35  5e5b							; If this goes above a threshold, means no data received
-     36  5e5b		       00		      .byte.b	$00
-     37  5e5c
-     38  5e5c				   NET_TIMEDOUT 		; Flag for main game loop
-     39  5e5c		       00		      .byte.b	$00
-     40  5e5d
-     41  5e5d				   NET_FAILED
-     42  5e5d		       00		      .byte.b	$00
-     43  5e5e
-     44  5e5e							;----------------------------------------------------------------
-     45  5e5e							; Called from main program
-     46  5e5e				   NETWORK_SETUP
-     47  5e5e
+     21  5e59		       0b b8	   USER_UDP_PORT =	3000
+     22  5e59
+     23  5e59		       8e 86	   UDP_DATA_IN equ	INPACKET+$2A	; Beginning of UDP data buffer
+     24  5e59
+     25  5e59							;Various Flags...
+     26  5e59
+     27  5e59				   PACKET_RECEIVED		; Flag for incoming data
+     28  5e59		       00		      .byte.b	$00
+     29  5e5a
+     30  5e5a				   NETSETUPFINISHED
+     31  5e5a		       00		      .byte.b	$00
+     32  5e5b
+     33  5e5b				   NETWORK_TIMEOUT		; Reset by packet receive.
+     34  5e5b							; If this goes above a threshold, means no data received
+     35  5e5b		       00		      .byte.b	$00
+     36  5e5c
+     37  5e5c				   NET_TIMEDOUT 		; Flag for main game loop
+     38  5e5c		       00		      .byte.b	$00
+     39  5e5d
+     40  5e5d				   NET_FAILED
+     41  5e5d		       00		      .byte.b	$00
+     42  5e5e
+     43  5e5e							;----------------------------------------------------------------
+     44  5e5e							; Called from main program
+     45  5e5e				   NETWORK_SETUP
+     46  5e5e
       0  5e5e					      PRINT	CG_RED
       1  5e5e		       20 60 63 	      jsr	prns
       2  5e61		       1c 00		      dc.b	CG_RED,0
-     49  5e63							; Basic card initialization
-     50  5e63		       20 b6 61 	      jsr	net_init	; Carry set if failed
-     51  5e66		       90 0b		      bcc	UDPSETUP
-     52  5e68
-     53  5e68							;Failed
-     54  5e68		       20 38 63 	      jsr	getanykey
-     55  5e6b		       a9 01		      lda	#$01
-     56  5e6d		       8d 5d 5e 	      sta	NET_FAILED
-     57  5e70		       4c 88 5e 	      jmp	NETWORK_SETUP_x
-     58  5e73
-     59  5e73				   UDPSETUP
-     60  5e73							; UDP Setup
-     61  5e73		       a9 b8		      lda	#<3000	; This doesn't have to match USER_UDP_PORT, but it does
-     62  5e75		       a2 0b		      ldx	#>3000
-     63  5e77		       20 18 84 	      jsr	UDP_SET_SRC_PORT
-     64  5e7a
-     65  5e7a		       a9 ba		      lda	#<3002
-     66  5e7c		       a2 0b		      ldx	#>3002
-     67  5e7e		       20 1f 84 	      jsr	UDP_SET_DEST_PORT
-     68  5e81
-     69  5e81		       a9 4b		      lda	#<SERVER_IP
-     70  5e83		       a2 5e		      ldx	#>SERVER_IP
-     71  5e85		       20 26 84 	      jsr	UDP_SET_DEST_IP
-     72  5e88
-     73  5e88				   NETWORK_SETUP_x
-     74  5e88		       a9 00		      lda	#$00
-     75  5e8a		       8d 59 5e 	      sta	PACKET_RECEIVED
-     76  5e8d		       60		      rts
-     77  5e8e
-     78  5e8e							; -------------------------------------------------------------------------
-     79  5e8e							; Called from IRQ
-     80  5e8e				   NETWORK_UPDATE
-     81  5e8e		       20 a3 62 	      jsr	NETIRQ
-     82  5e91
-     83  5e91		       ad 5a 5e 	      lda	NETSETUPFINISHED
-     84  5e94		       f0 24		      beq	NETWORK_UPDATEx
-     85  5e96
-     86  5e96		       ad 5d 5e 	      lda	NET_FAILED
-     87  5e99		       d0 1f		      bne	NETWORK_UPDATEx
-     88  5e9b
-     89  5e9b		       20 87 5f 	      jsr	SENDUPDATE
-     90  5e9e
-     91  5e9e							;Network timeouts
-     92  5e9e		       ad 5c 5e 	      lda	NET_TIMEDOUT	; Timeout in progress
-     93  5ea1		       d0 18		      bne	NTIMEOUT
-     94  5ea3
-     95  5ea3		       ee 5b 5e 	      inc	NETWORK_TIMEOUT
-     96  5ea6		       ad 5b 5e 	      lda	NETWORK_TIMEOUT
-     97  5ea9
-     98  5ea9							; Packets are sent every 50 milliseconds (20/sec)
-     99  5ea9							; This routine is called every ~17 ms (NTSC)
-    100  5ea9							; If we go 30 calls (~0.5 seconds) without a packet, freeze game.
-    101  5ea9		       c9 1e		      cmp	#30	;Decimal
+     48  5e63							; Basic card initialization
+     49  5e63		       20 b6 61 	      jsr	net_init	; Carry set if failed
+     50  5e66		       90 0b		      bcc	UDPSETUP
+     51  5e68
+     52  5e68							;Failed
+     53  5e68		       20 38 63 	      jsr	getanykey
+     54  5e6b		       a9 01		      lda	#$01
+     55  5e6d		       8d 5d 5e 	      sta	NET_FAILED
+     56  5e70		       4c 88 5e 	      jmp	NETWORK_SETUP_x
+     57  5e73
+     58  5e73				   UDPSETUP
+     59  5e73							; UDP Setup
+     60  5e73		       a9 b8		      lda	#<3000	; This doesn't have to match USER_UDP_PORT, but it does
+     61  5e75		       a2 0b		      ldx	#>3000
+     62  5e77		       20 18 84 	      jsr	UDP_SET_SRC_PORT
+     63  5e7a
+     64  5e7a		       a9 ba		      lda	#<3002
+     65  5e7c		       a2 0b		      ldx	#>3002
+     66  5e7e		       20 1f 84 	      jsr	UDP_SET_DEST_PORT
+     67  5e81
+     68  5e81		       a9 4b		      lda	#<SERVER_IP
+     69  5e83		       a2 5e		      ldx	#>SERVER_IP
+     70  5e85		       20 26 84 	      jsr	UDP_SET_DEST_IP
+     71  5e88
+     72  5e88				   NETWORK_SETUP_x
+     73  5e88		       a9 00		      lda	#$00
+     74  5e8a		       8d 59 5e 	      sta	PACKET_RECEIVED
+     75  5e8d		       60		      rts
+     76  5e8e
+     77  5e8e							; -------------------------------------------------------------------------
+     78  5e8e							; Called from IRQ
+     79  5e8e				   NETWORK_UPDATE
+     80  5e8e		       20 a3 62 	      jsr	NETIRQ
+     81  5e91
+     82  5e91		       ad 5a 5e 	      lda	NETSETUPFINISHED
+     83  5e94		       f0 24		      beq	NETWORK_UPDATEx
+     84  5e96
+     85  5e96		       ad 5d 5e 	      lda	NET_FAILED
+     86  5e99		       d0 1f		      bne	NETWORK_UPDATEx
+     87  5e9b
+     88  5e9b		       20 87 5f 	      jsr	SENDUPDATE
+     89  5e9e
+     90  5e9e							;Network timeouts
+     91  5e9e		       ad 5c 5e 	      lda	NET_TIMEDOUT	; Timeout in progress
+     92  5ea1		       d0 18		      bne	NTIMEOUT
+     93  5ea3
+     94  5ea3		       ee 5b 5e 	      inc	NETWORK_TIMEOUT
+     95  5ea6		       ad 5b 5e 	      lda	NETWORK_TIMEOUT
+     96  5ea9
+     97  5ea9							; Packets are sent every 50 milliseconds (20/sec)
+     98  5ea9							; This routine is called every ~17 ms (NTSC)
+     99  5ea9							; If we go 30 calls (~0.5 seconds) without a packet, freeze game.
+    100  5ea9		       c9 1e		      cmp	#30	;Decimal
       0  5eab					      blt	NETWORK_UPDATEx
       1  5eab		       90 0d		      bcc	NETWORK_UPDATEx
-    103  5ead
-    104  5ead		       a9 01		      lda	#$01
-    105  5eaf		       8d 5c 5e 	      sta	NET_TIMEDOUT
-    106  5eb2		       a9 00		      lda	#$00
-    107  5eb4		       8d 59 5e 	      sta	PACKET_RECEIVED
-    108  5eb7		       20 bb 5e 	      jsr	NTIMEOUT
-    109  5eba
-    110  5eba				   NETWORK_UPDATEx
-    111  5eba		       60		      rts
-    112  5ebb
-    113  5ebb				   NTIMEOUT
-    114  5ebb		       a9 02		      lda	#$02
-    115  5ebd		       8d 20 d0 	      sta	$d020
-    116  5ec0
-    117  5ec0		       20 39 5b 	      jsr	SOUND_TIMEOUT
-    118  5ec3		       ad 59 5e 	      lda	PACKET_RECEIVED
-    119  5ec6		       f0 08		      beq	NTIMEOUT_x	; No packet yet
-    120  5ec8
-    121  5ec8		       a9 00		      lda	#$00
-    122  5eca		       8d 20 d0 	      sta	$d020
-    123  5ecd		       8d 5c 5e 	      sta	NET_TIMEDOUT
-    124  5ed0
-    125  5ed0				   NTIMEOUT_x
-    126  5ed0		       60		      rts
+    102  5ead
+    103  5ead		       a9 01		      lda	#$01
+    104  5eaf		       8d 5c 5e 	      sta	NET_TIMEDOUT
+    105  5eb2		       a9 00		      lda	#$00
+    106  5eb4		       8d 59 5e 	      sta	PACKET_RECEIVED
+    107  5eb7		       20 bb 5e 	      jsr	NTIMEOUT
+    108  5eba
+    109  5eba				   NETWORK_UPDATEx
+    110  5eba		       60		      rts
+    111  5ebb
+    112  5ebb				   NTIMEOUT
+    113  5ebb		       a9 02		      lda	#$02
+    114  5ebd		       8d 20 d0 	      sta	$d020
+    115  5ec0
+    116  5ec0		       20 39 5b 	      jsr	SOUND_TIMEOUT
+    117  5ec3		       ad 59 5e 	      lda	PACKET_RECEIVED
+    118  5ec6		       f0 08		      beq	NTIMEOUT_x	; No packet yet
+    119  5ec8
+    120  5ec8		       a9 00		      lda	#$00
+    121  5eca		       8d 20 d0 	      sta	$d020
+    122  5ecd		       8d 5c 5e 	      sta	NET_TIMEDOUT
+    123  5ed0
+    124  5ed0				   NTIMEOUT_x
+    125  5ed0		       60		      rts
+    126  5ed1
     127  5ed1
-    128  5ed1
-    129  5ed1							; -------------------------------------------------------------------------
-    130  5ed1							; Get Gateway MAC
-    131  5ed1							; -------------------------------------------------------------------------
-    132  5ed1
-    133  5ed1							;Only get gateway MAC if the opponent's not on the local subnet
-    134  5ed1				   GATEWAYMAC
-    135  5ed1		       a9 8c		      lda	#<UDP_DEST_IP
-    136  5ed3		       a2 83		      ldx	#>UDP_DEST_IP
-    137  5ed5		       20 fd 66 	      jsr	IPMASK
-    138  5ed8		       90 4e		      bcc	MAC_SKIP
-    139  5eda
+    128  5ed1							; -------------------------------------------------------------------------
+    129  5ed1							; Get Gateway MAC
+    130  5ed1							; -------------------------------------------------------------------------
+    131  5ed1
+    132  5ed1							;Only get gateway MAC if the opponent's not on the local subnet
+    133  5ed1				   GATEWAYMAC
+    134  5ed1		       a9 8c		      lda	#<UDP_DEST_IP
+    135  5ed3		       a2 83		      ldx	#>UDP_DEST_IP
+    136  5ed5		       20 fd 66 	      jsr	IPMASK
+    137  5ed8		       90 4e		      bcc	MAC_SKIP
+    138  5eda
       0  5eda					      PRINT	CRLF,"RESOLVING GATEWAY MAC..."
       1  5eda		       20 60 63 	      jsr	prns
       2  5edd		       0d 52 45 53*	      dc.b	CRLF,"RESOLVING GATEWAY MAC...",0
-    141  5ef7		       20 57 62 	      jsr	get_macs
-    142  5efa		       90 25		      bcc	MAC_OK
-    143  5efc
-    144  5efc							;Flag errors
+    140  5ef7		       20 57 62 	      jsr	get_macs
+    141  5efa		       90 25		      bcc	MAC_OK
+    142  5efc
+    143  5efc							;Flag errors
       0  5efc					      PRINT	CRLF,CG_WHT,"ERROR RESOLVING THE GW MAC!",CRLF
       1  5efc		       20 60 63 	      jsr	prns
       2  5eff		       0d 05 45 52*	      dc.b	CRLF,CG_WHT,"ERROR RESOLVING THE GW MAC!",CRLF,0
-    146  5f1e
-    147  5f1e		       4c 1e 5f    nomac      jmp	nomac	;Freeze
-    148  5f21
-    149  5f21				   MAC_OK
+    145  5f1e
+    146  5f1e		       4c 1e 5f    nomac      jmp	nomac	;Freeze
+    147  5f21
+    148  5f21				   MAC_OK
       0  5f21					      PRINT	"OK",CRLF
       1  5f21		       20 60 63 	      jsr	prns
       2  5f24		       4f 4b 0d 00	      dc.b	"OK",CRLF,0
-    151  5f28				   MAC_SKIP
-    152  5f28		       60		      rts
-    153  5f29
-    154  5f29							; -------------------------------------------------------------------------
-    155  5f29							; Get Server MAC (LAN Mode only)
-    156  5f29							; -------------------------------------------------------------------------
-    157  5f29
-    158  5f29				   SERVERMAC
+    150  5f28				   MAC_SKIP
+    151  5f28		       60		      rts
+    152  5f29
+    153  5f29							; -------------------------------------------------------------------------
+    154  5f29							; Get Server MAC (LAN Mode only)
+    155  5f29							; -------------------------------------------------------------------------
+    156  5f29
+    157  5f29				   SERVERMAC
       0  5f29					      PRINT	CRLF,"RESOLVING SERVER MAC..."
       1  5f29		       20 60 63 	      jsr	prns
       2  5f2c		       0d 52 45 53*	      dc.b	CRLF,"RESOLVING SERVER MAC...",0
-    160  5f45
-    161  5f45							;get MAC for server
-    162  5f45		       a9 4b		      lda	#<SERVER_IP
-    163  5f47		       a2 5e		      ldx	#>SERVER_IP
-    164  5f49		       20 f6 6c 	      jsr	GET_ARP
-    165  5f4c		       b0 10		      bcs	SMAC_FAILED
-    166  5f4e							;copy gateway mac
-    167  5f4e		       a2 00		      ldx	#$00
-    168  5f50				   gm1_0
-    169  5f50		       bd 6a 6b 	      lda	ARP_MAC,x
-    170  5f53		       9d 53 5e 	      sta	SERVER_MAC,x
-    171  5f56		       e8		      inx
-    172  5f57		       e0 06		      cpx	#$06
-    173  5f59		       d0 f5		      bne	gm1_0
-    174  5f5b
-    175  5f5b		       4c 21 5f 	      jmp	MAC_OK
-    176  5f5e
-    177  5f5e				   SMAC_FAILED
+    159  5f45
+    160  5f45							;get MAC for server
+    161  5f45		       a9 4b		      lda	#<SERVER_IP
+    162  5f47		       a2 5e		      ldx	#>SERVER_IP
+    163  5f49		       20 f6 6c 	      jsr	GET_ARP
+    164  5f4c		       b0 10		      bcs	SMAC_FAILED
+    165  5f4e							;copy gateway mac
+    166  5f4e		       a2 00		      ldx	#$00
+    167  5f50				   gm1_0
+    168  5f50		       bd 6a 6b 	      lda	ARP_MAC,x
+    169  5f53		       9d 53 5e 	      sta	SERVER_MAC,x
+    170  5f56		       e8		      inx
+    171  5f57		       e0 06		      cpx	#$06
+    172  5f59		       d0 f5		      bne	gm1_0
+    173  5f5b
+    174  5f5b		       4c 21 5f 	      jmp	MAC_OK
+    175  5f5e
+    176  5f5e				   SMAC_FAILED
       0  5f5e					      PRINT	CRLF,CG_WHT,"ERROR RESOLVING THE SERVER MAC!",CRLF
       1  5f5e		       20 60 63 	      jsr	prns
       2  5f61		       0d 05 45 52*	      dc.b	CRLF,CG_WHT,"ERROR RESOLVING THE SERVER MAC!",CRLF,0
-    179  5f84
-    180  5f84		       4c 84 5f    nomac1     jmp	nomac1	;Freeze
-    181  5f87
-    182  5f87							; -------------------------------------------------------------------------
-    183  5f87							; Packet Send Routine
-    184  5f87							; -------------------------------------------------------------------------
-    185  5f87
-    186  5f87				   SENDUPDATE
-    187  5f87		       a9 0e		      lda	#$0e	; Including zero-term. and checksum
-    188  5f89		       a2 00		      ldx	#$00
-    189  5f8b		       20 3a 84 	      jsr	UDP_SET_DATALEN
-    190  5f8e
-    191  5f8e							; Packet type
-    192  5f8e		       a9 00		      lda	#$00	; Game update
-    193  5f90		       8d 8c 80 	      sta	UDP_DATA
-    194  5f93
-    195  5f93							; X Position
-    196  5f93		       ad 83 2d 	      lda	MYXPOS+1
-    197  5f96		       ae 84 2d 	      ldx	MYXPOS+2	; High byte, TODO
-    198  5f99		       8d 8d 80 	      sta	UDP_DATA+1
-    199  5f9c		       8e 8e 80 	      stx	UDP_DATA+2
-    200  5f9f
-    201  5f9f							; Y Position
-    202  5f9f		       ad b9 34 	      lda	REALTRACKPOS+1
-    203  5fa2		       ae ba 34 	      ldx	REALTRACKPOS+2
-    204  5fa5		       8d 8f 80 	      sta	UDP_DATA+3
-    205  5fa8		       8e 90 80 	      stx	UDP_DATA+4
-    206  5fab
-    207  5fab							;X Speed (include fractional)
-    208  5fab		       ad 85 2d 	      lda	MYX_SPEED
-    209  5fae		       ae 86 2d 	      ldx	MYX_SPEED+1
-    210  5fb1		       8d 91 80 	      sta	UDP_DATA+5
-    211  5fb4		       8e 92 80 	      stx	UDP_DATA+6
-    212  5fb7
-    213  5fb7							;Y Speed (include fractional)
-    214  5fb7		       ad dc 31 	      lda	MY_SPEED
-    215  5fba		       ae dd 31 	      ldx	MY_SPEED+1
-    216  5fbd		       8d 93 80 	      sta	UDP_DATA+7
-    217  5fc0		       8e 94 80 	      stx	UDP_DATA+8
-    218  5fc3
-    219  5fc3							;Car color
-    220  5fc3		       ad 27 d0 	      lda	sprite1color
-    221  5fc6		       8d 95 80 	      sta	UDP_DATA+9
-    222  5fc9
-    223  5fc9							;Sprite#
-    224  5fc9		       ad f8 07 	      lda	sprite1pnt
-    225  5fcc		       8d 96 80 	      sta	UDP_DATA+10
-    226  5fcf
-    227  5fcf							; Send!
-    228  5fcf		       20 c7 83 	      jsr	UDP_SEND
-    229  5fd2		       60		      rts
+    178  5f84
+    179  5f84		       4c 84 5f    nomac1     jmp	nomac1	;Freeze
+    180  5f87
+    181  5f87							; -------------------------------------------------------------------------
+    182  5f87							; Packet Send Routine
+    183  5f87							; -------------------------------------------------------------------------
+    184  5f87
+    185  5f87				   SENDUPDATE
+    186  5f87		       a9 0e		      lda	#$0e	; Including zero-term. and checksum
+    187  5f89		       a2 00		      ldx	#$00
+    188  5f8b		       20 3a 84 	      jsr	UDP_SET_DATALEN
+    189  5f8e
+    190  5f8e							; Packet type
+    191  5f8e		       a9 00		      lda	#$00	; Game update
+    192  5f90		       8d 8c 80 	      sta	UDP_DATA
+    193  5f93
+    194  5f93							; X Position
+    195  5f93		       ad 83 2d 	      lda	MYXPOS+1
+    196  5f96		       ae 84 2d 	      ldx	MYXPOS+2	; High byte, TODO
+    197  5f99		       8d 8d 80 	      sta	UDP_DATA+1
+    198  5f9c		       8e 8e 80 	      stx	UDP_DATA+2
+    199  5f9f
+    200  5f9f							; Y Position
+    201  5f9f		       ad b9 34 	      lda	REALTRACKPOS+1
+    202  5fa2		       ae ba 34 	      ldx	REALTRACKPOS+2
+    203  5fa5		       8d 8f 80 	      sta	UDP_DATA+3
+    204  5fa8		       8e 90 80 	      stx	UDP_DATA+4
+    205  5fab
+    206  5fab							;X Speed (include fractional)
+    207  5fab		       ad 85 2d 	      lda	MYX_SPEED
+    208  5fae		       ae 86 2d 	      ldx	MYX_SPEED+1
+    209  5fb1		       8d 91 80 	      sta	UDP_DATA+5
+    210  5fb4		       8e 92 80 	      stx	UDP_DATA+6
+    211  5fb7
+    212  5fb7							;Y Speed (include fractional)
+    213  5fb7		       ad dc 31 	      lda	MY_SPEED
+    214  5fba		       ae dd 31 	      ldx	MY_SPEED+1
+    215  5fbd		       8d 93 80 	      sta	UDP_DATA+7
+    216  5fc0		       8e 94 80 	      stx	UDP_DATA+8
+    217  5fc3
+    218  5fc3							;Car color
+    219  5fc3		       ad 27 d0 	      lda	sprite1color
+    220  5fc6		       8d 95 80 	      sta	UDP_DATA+9
+    221  5fc9
+    222  5fc9							;Sprite#
+    223  5fc9		       ad f8 07 	      lda	sprite1pnt
+    224  5fcc		       8d 96 80 	      sta	UDP_DATA+10
+    225  5fcf
+    226  5fcf							; Send!
+    227  5fcf		       20 c7 83 	      jsr	UDP_SEND
+    228  5fd2		       60		      rts
+    229  5fd3
     230  5fd3
-    231  5fd3
-    232  5fd3							; -------------------------------------------------------------------------
-    233  5fd3							; Packet Receive + Handling Routines
-    234  5fd3							; -------------------------------------------------------------------------
-    235  5fd3
-    236  5fd3							; Temporary holder of the checksum we received
-    237  5fd3				   RCV_CSUM
-    238  5fd3		       ff		      dc.b	$ff
-    239  5fd4
-    240  5fd4							; ==============================================================
-    241  5fd4							; Master packet receiver.  This occurs inside the interrupt!
-    242  5fd4							; A UDP packet has arrived, and the port matches the one we want.
-    243  5fd4							; ==============================================================
-    244  5fd4
-    245  5fd4				   MYUDP_PROCESS SUBROUTINE
-    246  5fd4							; Check checksum, and don't ack if bad
-    247  5fd4							;  jsr CHECKSUM
-    248  5fd4							;  jmp BADCSUM
-    249  5fd4
-    250  5fd4		       ee bf db 	      inc	COMMSLED
-    251  5fd7
-    252  5fd7							; Reset timeout
-    253  5fd7		       a9 00		      lda	#$00
-    254  5fd9		       8d 5b 5e 	      sta	NETWORK_TIMEOUT
-    255  5fdc
-    256  5fdc							; Display sprites as commanded by the server
-    257  5fdc							;--------------------------------------
-    258  5fdc		       ae 87 8e 	      ldx	UDP_DATA_IN+1
-    259  5fdf		       ac 89 8e 	      ldy	UDP_DATA_IN+3
-    260  5fe2		       8e 02 d0 	      stx	sprite2x
-    261  5fe5		       8e c4 31 	      stx	IN_XPOSLOW+1
-    262  5fe8		       8c 03 d0 	      sty	sprite2y
-    263  5feb		       8c d4 31 	      sty	IN_YPOS+1
-    264  5fee
-    265  5fee		       ad 8b 8e 	      lda	UDP_DATA_IN+5
-    266  5ff1		       8d a4 31 	      sta	IN_XSPEEDLOW+1
-    267  5ff4		       ad 8c 8e 	      lda	UDP_DATA_IN+6
-    268  5ff7		       8d ac 31 	      sta	IN_XSPEEDHIGH+1
-    269  5ffa
-    270  5ffa		       ad 8d 8e 	      lda	UDP_DATA_IN+7
-    271  5ffd		       8d b4 31 	      sta	IN_YSPEEDLOW+1
-    272  6000		       ad 8e 8e 	      lda	UDP_DATA_IN+8
-    273  6003		       8d bc 31 	      sta	IN_YSPEEDHIGH+1
-    274  6006
-    275  6006		       ad 8f 8e 	      lda	UDP_DATA_IN+9
-    276  6009		       8d 28 d0 	      sta	sprite2color
-    277  600c		       ad 90 8e 	      lda	UDP_DATA_IN+10
-    278  600f		       8d f9 07 	      sta	sprite2pnt
-    279  6012
-    280  6012							;--------------------------------------
-    281  6012		       ae 93 8e 	      ldx	UDP_DATA_IN+13
-    282  6015		       ac 95 8e 	      ldy	UDP_DATA_IN+15
-    283  6018		       8e 04 d0 	      stx	sprite3x
-    284  601b		       8e c5 31 	      stx	IN_XPOSLOW+2
-    285  601e		       8c 05 d0 	      sty	sprite3y
-    286  6021		       8c d5 31 	      sty	IN_YPOS+2
-    287  6024
-    288  6024		       ad 97 8e 	      lda	UDP_DATA_IN+17
-    289  6027		       8d a5 31 	      sta	IN_XSPEEDLOW+2
-    290  602a		       ad 98 8e 	      lda	UDP_DATA_IN+18
-    291  602d		       8d ad 31 	      sta	IN_XSPEEDHIGH+2
-    292  6030
-    293  6030		       ad 99 8e 	      lda	UDP_DATA_IN+19
-    294  6033		       8d b5 31 	      sta	IN_YSPEEDLOW+2
-    295  6036		       ad 9a 8e 	      lda	UDP_DATA_IN+20
-    296  6039		       8d bd 31 	      sta	IN_YSPEEDHIGH+2
-    297  603c
-    298  603c		       ad 9b 8e 	      lda	UDP_DATA_IN+21
-    299  603f		       8d 29 d0 	      sta	sprite3color
-    300  6042		       ad 9c 8e 	      lda	UDP_DATA_IN+22
-    301  6045		       8d fa 07 	      sta	sprite3pnt
-    302  6048
-    303  6048							;--------------------------------------
-    304  6048		       ae 9f 8e 	      ldx	UDP_DATA_IN+25
-    305  604b		       ac a1 8e 	      ldy	UDP_DATA_IN+27
-    306  604e		       8e 06 d0 	      stx	sprite4x
-    307  6051		       8e c6 31 	      stx	IN_XPOSLOW+3
-    308  6054		       8c 07 d0 	      sty	sprite4y
-    309  6057		       8c d6 31 	      sty	IN_YPOS+3
-    310  605a
-    311  605a		       ad a3 8e 	      lda	UDP_DATA_IN+29
-    312  605d		       8d a6 31 	      sta	IN_XSPEEDLOW+3
-    313  6060		       ad a4 8e 	      lda	UDP_DATA_IN+30
-    314  6063		       8d ae 31 	      sta	IN_XSPEEDHIGH+3
-    315  6066
-    316  6066		       ad a5 8e 	      lda	UDP_DATA_IN+31
-    317  6069		       8d b6 31 	      sta	IN_YSPEEDLOW+3
-    318  606c		       ad a6 8e 	      lda	UDP_DATA_IN+32
-    319  606f		       8d be 31 	      sta	IN_YSPEEDHIGH+3
-    320  6072
-    321  6072		       ad a7 8e 	      lda	UDP_DATA_IN+33
-    322  6075		       8d 2a d0 	      sta	sprite4color
-    323  6078		       ad a8 8e 	      lda	UDP_DATA_IN+34
-    324  607b		       8d fb 07 	      sta	sprite4pnt
-    325  607e
-    326  607e							;--------------------------------------
-    327  607e		       ae ab 8e 	      ldx	UDP_DATA_IN+37
-    328  6081		       ac ad 8e 	      ldy	UDP_DATA_IN+39
-    329  6084		       8e 08 d0 	      stx	sprite5x
-    330  6087		       8e c7 31 	      stx	IN_XPOSLOW+4
-    331  608a		       8c 09 d0 	      sty	sprite5y
-    332  608d		       8c d7 31 	      sty	IN_YPOS+4
-    333  6090
-    334  6090		       ad af 8e 	      lda	UDP_DATA_IN+41
-    335  6093		       8d a7 31 	      sta	IN_XSPEEDLOW+4
-    336  6096		       ad b0 8e 	      lda	UDP_DATA_IN+42
-    337  6099		       8d af 31 	      sta	IN_XSPEEDHIGH+4
-    338  609c
-    339  609c		       ad b1 8e 	      lda	UDP_DATA_IN+43
-    340  609f		       8d b7 31 	      sta	IN_YSPEEDLOW+4
-    341  60a2		       ad b2 8e 	      lda	UDP_DATA_IN+44
-    342  60a5		       8d bf 31 	      sta	IN_YSPEEDHIGH+4
-    343  60a8
-    344  60a8		       ad b3 8e 	      lda	UDP_DATA_IN+45
-    345  60ab		       8d 2b d0 	      sta	sprite5color
-    346  60ae		       ad b4 8e 	      lda	UDP_DATA_IN+46
-    347  60b1		       8d fc 07 	      sta	sprite5pnt
-    348  60b4
-    349  60b4							;--------------------------------------
-    350  60b4		       ae b7 8e 	      ldx	UDP_DATA_IN+49
-    351  60b7		       ac b9 8e 	      ldy	UDP_DATA_IN+51
-    352  60ba		       8e 0a d0 	      stx	sprite6x
-    353  60bd		       8e c8 31 	      stx	IN_XPOSLOW+5
-    354  60c0		       8c 0b d0 	      sty	sprite6y
-    355  60c3		       8c d8 31 	      sty	IN_YPOS+5
-    356  60c6
-    357  60c6		       ad bb 8e 	      lda	UDP_DATA_IN+53
-    358  60c9		       8d a8 31 	      sta	IN_XSPEEDLOW+5
-    359  60cc		       ad bc 8e 	      lda	UDP_DATA_IN+54
-    360  60cf		       8d b0 31 	      sta	IN_XSPEEDHIGH+5
-    361  60d2
-    362  60d2		       ad bd 8e 	      lda	UDP_DATA_IN+55
-    363  60d5		       8d b8 31 	      sta	IN_YSPEEDLOW+5
-    364  60d8		       ad be 8e 	      lda	UDP_DATA_IN+56
-    365  60db		       8d c0 31 	      sta	IN_YSPEEDHIGH+5
-    366  60de
-    367  60de		       ad bf 8e 	      lda	UDP_DATA_IN+57
-    368  60e1		       8d 2c d0 	      sta	sprite6color
-    369  60e4		       ad c0 8e 	      lda	UDP_DATA_IN+58
-    370  60e7		       8d fd 07 	      sta	sprite6pnt
-    371  60ea
-    372  60ea							;--------------------------------------
-    373  60ea		       ae c3 8e 	      ldx	UDP_DATA_IN+61
-    374  60ed		       ac c5 8e 	      ldy	UDP_DATA_IN+63
-    375  60f0		       8e 0c d0 	      stx	sprite7x
-    376  60f3		       8e c9 31 	      stx	IN_XPOSLOW+6
-    377  60f6		       8c 0d d0 	      sty	sprite7y
-    378  60f9		       8c d9 31 	      sty	IN_YPOS+6
-    379  60fc
-    380  60fc		       ad c7 8e 	      lda	UDP_DATA_IN+65
-    381  60ff		       8d a9 31 	      sta	IN_XSPEEDLOW+6
-    382  6102		       ad c8 8e 	      lda	UDP_DATA_IN+66
-    383  6105		       8d b1 31 	      sta	IN_XSPEEDHIGH+6
-    384  6108
-    385  6108		       ad c9 8e 	      lda	UDP_DATA_IN+67
-    386  610b		       8d b9 31 	      sta	IN_YSPEEDLOW+6
-    387  610e		       ad ca 8e 	      lda	UDP_DATA_IN+68
-    388  6111		       8d c1 31 	      sta	IN_YSPEEDHIGH+6
-    389  6114
-    390  6114		       ad cb 8e 	      lda	UDP_DATA_IN+69
-    391  6117		       8d 2d d0 	      sta	sprite7color
-    392  611a		       ad cc 8e 	      lda	UDP_DATA_IN+70
-    393  611d		       8d fe 07 	      sta	sprite7pnt
-    394  6120
-    395  6120							;--------------------------------------
-    396  6120		       ae cf 8e 	      ldx	UDP_DATA_IN+73
-    397  6123		       ac d1 8e 	      ldy	UDP_DATA_IN+75
-    398  6126		       8e 0e d0 	      stx	sprite8x
-    399  6129		       8e ca 31 	      stx	IN_XPOSLOW+7
-    400  612c		       8c 0f d0 	      sty	sprite8y
-    401  612f		       8c da 31 	      sty	IN_YPOS+7
-    402  6132
-    403  6132		       ad d3 8e 	      lda	UDP_DATA_IN+77
-    404  6135		       8d aa 31 	      sta	IN_XSPEEDLOW+7
-    405  6138		       ad d4 8e 	      lda	UDP_DATA_IN+78
-    406  613b		       8d b2 31 	      sta	IN_XSPEEDHIGH+7
-    407  613e
-    408  613e		       ad d5 8e 	      lda	UDP_DATA_IN+79
-    409  6141		       8d ba 31 	      sta	IN_YSPEEDLOW+7
-    410  6144		       ad d6 8e 	      lda	UDP_DATA_IN+80
-    411  6147		       8d c2 31 	      sta	IN_YSPEEDHIGH+7
-    412  614a
-    413  614a		       ad d7 8e 	      lda	UDP_DATA_IN+81
-    414  614d		       8d 2e d0 	      sta	sprite8color
-    415  6150		       ad d8 8e 	      lda	UDP_DATA_IN+82
-    416  6153		       8d ff 07 	      sta	sprite8pnt
-    417  6156
-    418  6156							;now, calculate MSB for sprites
-    419  6156		       a9 00		      lda	#0
-    420  6158		       ae 88 8e 	      ldx	UDP_DATA_IN+2
-    421  615b		       8e cc 31 	      stx	IN_XPOSHIGH+1
-    422  615e		       f0 02		      beq	.ahead1
-    423  6160		       09 02		      ora	#2
-    424  6162				   .ahead1
-    425  6162		       ae 94 8e 	      ldx	UDP_DATA_IN+14
-    426  6165		       8e cd 31 	      stx	IN_XPOSHIGH+2
-    427  6168		       f0 02		      beq	.ahead2
-    428  616a		       09 04		      ora	#4
-    429  616c				   .ahead2
-    430  616c		       ae a0 8e 	      ldx	UDP_DATA_IN+26
-    431  616f		       8e ce 31 	      stx	IN_XPOSHIGH+3
-    432  6172		       f0 02		      beq	.ahead3
-    433  6174		       09 08		      ora	#8
-    434  6176				   .ahead3
-    435  6176		       ae ac 8e 	      ldx	UDP_DATA_IN+38
-    436  6179		       8e cf 31 	      stx	IN_XPOSHIGH+4
-    437  617c		       f0 02		      beq	.ahead4
-    438  617e		       09 10		      ora	#16
-    439  6180				   .ahead4
-    440  6180		       ae b8 8e 	      ldx	UDP_DATA_IN+50
-    441  6183		       8e d0 31 	      stx	IN_XPOSHIGH+5
-    442  6186		       f0 02		      beq	.ahead5
-    443  6188		       09 20		      ora	#32
-    444  618a				   .ahead5
-    445  618a		       ae c4 8e 	      ldx	UDP_DATA_IN+62
-    446  618d		       8e d1 31 	      stx	IN_XPOSHIGH+6
-    447  6190		       f0 02		      beq	.ahead6
-    448  6192		       09 40		      ora	#64
-    449  6194				   .ahead6
-    450  6194		       ae d0 8e 	      ldx	UDP_DATA_IN+74
-    451  6197		       8e d2 31 	      stx	IN_XPOSHIGH+7
-    452  619a		       f0 02		      beq	.ahead7
-    453  619c		       09 80		      ora	#128
-    454  619e				   .ahead7
-    455  619e							;sta .self+1
-    456  619e							;lda $d010
-    457  619e							;and #1
-    458  619e							;.self
-    459  619e							;ora #$ff ;self-mod!
-    460  619e							;sta $d010
-    461  619e		       8d db 31 	      sta	IN_XPOS_D010
-    462  61a1
-    463  61a1							;--------------------------------------
-    464  61a1				   MYUDP_PROCESS_x
-    465  61a1		       a9 01		      lda	#$01
-    466  61a3		       8d 59 5e 	      sta	PACKET_RECEIVED
-    467  61a6		       60		      rts
+    231  5fd3							; -------------------------------------------------------------------------
+    232  5fd3							; Packet Receive + Handling Routines
+    233  5fd3							; -------------------------------------------------------------------------
+    234  5fd3
+    235  5fd3							; Temporary holder of the checksum we received
+    236  5fd3				   RCV_CSUM
+    237  5fd3		       ff		      dc.b	$ff
+    238  5fd4
+    239  5fd4							; ==============================================================
+    240  5fd4							; Master packet receiver.  This occurs inside the interrupt!
+    241  5fd4							; A UDP packet has arrived, and the port matches the one we want.
+    242  5fd4							; ==============================================================
+    243  5fd4
+    244  5fd4				   MYUDP_PROCESS SUBROUTINE
+    245  5fd4							; Check checksum, and don't ack if bad
+    246  5fd4							;  jsr CHECKSUM
+    247  5fd4							;  jmp BADCSUM
+    248  5fd4
+    249  5fd4		       ee bf db 	      inc	COMMSLED
+    250  5fd7
+    251  5fd7							; Reset timeout
+    252  5fd7		       a9 00		      lda	#$00
+    253  5fd9		       8d 5b 5e 	      sta	NETWORK_TIMEOUT
+    254  5fdc
+    255  5fdc							; Display sprites as commanded by the server
+    256  5fdc							;--------------------------------------
+    257  5fdc		       ae 87 8e 	      ldx	UDP_DATA_IN+1
+    258  5fdf		       ac 89 8e 	      ldy	UDP_DATA_IN+3
+    259  5fe2		       8e 02 d0 	      stx	sprite2x
+    260  5fe5		       8e c4 31 	      stx	IN_XPOSLOW+1
+    261  5fe8		       8c 03 d0 	      sty	sprite2y
+    262  5feb		       8c d4 31 	      sty	IN_YPOS+1
+    263  5fee
+    264  5fee		       ad 8b 8e 	      lda	UDP_DATA_IN+5
+    265  5ff1		       8d a4 31 	      sta	IN_XSPEEDLOW+1
+    266  5ff4		       ad 8c 8e 	      lda	UDP_DATA_IN+6
+    267  5ff7		       8d ac 31 	      sta	IN_XSPEEDHIGH+1
+    268  5ffa
+    269  5ffa		       ad 8d 8e 	      lda	UDP_DATA_IN+7
+    270  5ffd		       8d b4 31 	      sta	IN_YSPEEDLOW+1
+    271  6000		       ad 8e 8e 	      lda	UDP_DATA_IN+8
+    272  6003		       8d bc 31 	      sta	IN_YSPEEDHIGH+1
+    273  6006
+    274  6006		       ad 8f 8e 	      lda	UDP_DATA_IN+9
+    275  6009		       8d 28 d0 	      sta	sprite2color
+    276  600c		       ad 90 8e 	      lda	UDP_DATA_IN+10
+    277  600f		       8d f9 07 	      sta	sprite2pnt
+    278  6012
+    279  6012							;--------------------------------------
+    280  6012		       ae 93 8e 	      ldx	UDP_DATA_IN+13
+    281  6015		       ac 95 8e 	      ldy	UDP_DATA_IN+15
+    282  6018		       8e 04 d0 	      stx	sprite3x
+    283  601b		       8e c5 31 	      stx	IN_XPOSLOW+2
+    284  601e		       8c 05 d0 	      sty	sprite3y
+    285  6021		       8c d5 31 	      sty	IN_YPOS+2
+    286  6024
+    287  6024		       ad 97 8e 	      lda	UDP_DATA_IN+17
+    288  6027		       8d a5 31 	      sta	IN_XSPEEDLOW+2
+    289  602a		       ad 98 8e 	      lda	UDP_DATA_IN+18
+    290  602d		       8d ad 31 	      sta	IN_XSPEEDHIGH+2
+    291  6030
+    292  6030		       ad 99 8e 	      lda	UDP_DATA_IN+19
+    293  6033		       8d b5 31 	      sta	IN_YSPEEDLOW+2
+    294  6036		       ad 9a 8e 	      lda	UDP_DATA_IN+20
+    295  6039		       8d bd 31 	      sta	IN_YSPEEDHIGH+2
+    296  603c
+    297  603c		       ad 9b 8e 	      lda	UDP_DATA_IN+21
+    298  603f		       8d 29 d0 	      sta	sprite3color
+    299  6042		       ad 9c 8e 	      lda	UDP_DATA_IN+22
+    300  6045		       8d fa 07 	      sta	sprite3pnt
+    301  6048
+    302  6048							;--------------------------------------
+    303  6048		       ae 9f 8e 	      ldx	UDP_DATA_IN+25
+    304  604b		       ac a1 8e 	      ldy	UDP_DATA_IN+27
+    305  604e		       8e 06 d0 	      stx	sprite4x
+    306  6051		       8e c6 31 	      stx	IN_XPOSLOW+3
+    307  6054		       8c 07 d0 	      sty	sprite4y
+    308  6057		       8c d6 31 	      sty	IN_YPOS+3
+    309  605a
+    310  605a		       ad a3 8e 	      lda	UDP_DATA_IN+29
+    311  605d		       8d a6 31 	      sta	IN_XSPEEDLOW+3
+    312  6060		       ad a4 8e 	      lda	UDP_DATA_IN+30
+    313  6063		       8d ae 31 	      sta	IN_XSPEEDHIGH+3
+    314  6066
+    315  6066		       ad a5 8e 	      lda	UDP_DATA_IN+31
+    316  6069		       8d b6 31 	      sta	IN_YSPEEDLOW+3
+    317  606c		       ad a6 8e 	      lda	UDP_DATA_IN+32
+    318  606f		       8d be 31 	      sta	IN_YSPEEDHIGH+3
+    319  6072
+    320  6072		       ad a7 8e 	      lda	UDP_DATA_IN+33
+    321  6075		       8d 2a d0 	      sta	sprite4color
+    322  6078		       ad a8 8e 	      lda	UDP_DATA_IN+34
+    323  607b		       8d fb 07 	      sta	sprite4pnt
+    324  607e
+    325  607e							;--------------------------------------
+    326  607e		       ae ab 8e 	      ldx	UDP_DATA_IN+37
+    327  6081		       ac ad 8e 	      ldy	UDP_DATA_IN+39
+    328  6084		       8e 08 d0 	      stx	sprite5x
+    329  6087		       8e c7 31 	      stx	IN_XPOSLOW+4
+    330  608a		       8c 09 d0 	      sty	sprite5y
+    331  608d		       8c d7 31 	      sty	IN_YPOS+4
+    332  6090
+    333  6090		       ad af 8e 	      lda	UDP_DATA_IN+41
+    334  6093		       8d a7 31 	      sta	IN_XSPEEDLOW+4
+    335  6096		       ad b0 8e 	      lda	UDP_DATA_IN+42
+    336  6099		       8d af 31 	      sta	IN_XSPEEDHIGH+4
+    337  609c
+    338  609c		       ad b1 8e 	      lda	UDP_DATA_IN+43
+    339  609f		       8d b7 31 	      sta	IN_YSPEEDLOW+4
+    340  60a2		       ad b2 8e 	      lda	UDP_DATA_IN+44
+    341  60a5		       8d bf 31 	      sta	IN_YSPEEDHIGH+4
+    342  60a8
+    343  60a8		       ad b3 8e 	      lda	UDP_DATA_IN+45
+    344  60ab		       8d 2b d0 	      sta	sprite5color
+    345  60ae		       ad b4 8e 	      lda	UDP_DATA_IN+46
+    346  60b1		       8d fc 07 	      sta	sprite5pnt
+    347  60b4
+    348  60b4							;--------------------------------------
+    349  60b4		       ae b7 8e 	      ldx	UDP_DATA_IN+49
+    350  60b7		       ac b9 8e 	      ldy	UDP_DATA_IN+51
+    351  60ba		       8e 0a d0 	      stx	sprite6x
+    352  60bd		       8e c8 31 	      stx	IN_XPOSLOW+5
+    353  60c0		       8c 0b d0 	      sty	sprite6y
+    354  60c3		       8c d8 31 	      sty	IN_YPOS+5
+    355  60c6
+    356  60c6		       ad bb 8e 	      lda	UDP_DATA_IN+53
+    357  60c9		       8d a8 31 	      sta	IN_XSPEEDLOW+5
+    358  60cc		       ad bc 8e 	      lda	UDP_DATA_IN+54
+    359  60cf		       8d b0 31 	      sta	IN_XSPEEDHIGH+5
+    360  60d2
+    361  60d2		       ad bd 8e 	      lda	UDP_DATA_IN+55
+    362  60d5		       8d b8 31 	      sta	IN_YSPEEDLOW+5
+    363  60d8		       ad be 8e 	      lda	UDP_DATA_IN+56
+    364  60db		       8d c0 31 	      sta	IN_YSPEEDHIGH+5
+    365  60de
+    366  60de		       ad bf 8e 	      lda	UDP_DATA_IN+57
+    367  60e1		       8d 2c d0 	      sta	sprite6color
+    368  60e4		       ad c0 8e 	      lda	UDP_DATA_IN+58
+    369  60e7		       8d fd 07 	      sta	sprite6pnt
+    370  60ea
+    371  60ea							;--------------------------------------
+    372  60ea		       ae c3 8e 	      ldx	UDP_DATA_IN+61
+    373  60ed		       ac c5 8e 	      ldy	UDP_DATA_IN+63
+    374  60f0		       8e 0c d0 	      stx	sprite7x
+    375  60f3		       8e c9 31 	      stx	IN_XPOSLOW+6
+    376  60f6		       8c 0d d0 	      sty	sprite7y
+    377  60f9		       8c d9 31 	      sty	IN_YPOS+6
+    378  60fc
+    379  60fc		       ad c7 8e 	      lda	UDP_DATA_IN+65
+    380  60ff		       8d a9 31 	      sta	IN_XSPEEDLOW+6
+    381  6102		       ad c8 8e 	      lda	UDP_DATA_IN+66
+    382  6105		       8d b1 31 	      sta	IN_XSPEEDHIGH+6
+    383  6108
+    384  6108		       ad c9 8e 	      lda	UDP_DATA_IN+67
+    385  610b		       8d b9 31 	      sta	IN_YSPEEDLOW+6
+    386  610e		       ad ca 8e 	      lda	UDP_DATA_IN+68
+    387  6111		       8d c1 31 	      sta	IN_YSPEEDHIGH+6
+    388  6114
+    389  6114		       ad cb 8e 	      lda	UDP_DATA_IN+69
+    390  6117		       8d 2d d0 	      sta	sprite7color
+    391  611a		       ad cc 8e 	      lda	UDP_DATA_IN+70
+    392  611d		       8d fe 07 	      sta	sprite7pnt
+    393  6120
+    394  6120							;--------------------------------------
+    395  6120		       ae cf 8e 	      ldx	UDP_DATA_IN+73
+    396  6123		       ac d1 8e 	      ldy	UDP_DATA_IN+75
+    397  6126		       8e 0e d0 	      stx	sprite8x
+    398  6129		       8e ca 31 	      stx	IN_XPOSLOW+7
+    399  612c		       8c 0f d0 	      sty	sprite8y
+    400  612f		       8c da 31 	      sty	IN_YPOS+7
+    401  6132
+    402  6132		       ad d3 8e 	      lda	UDP_DATA_IN+77
+    403  6135		       8d aa 31 	      sta	IN_XSPEEDLOW+7
+    404  6138		       ad d4 8e 	      lda	UDP_DATA_IN+78
+    405  613b		       8d b2 31 	      sta	IN_XSPEEDHIGH+7
+    406  613e
+    407  613e		       ad d5 8e 	      lda	UDP_DATA_IN+79
+    408  6141		       8d ba 31 	      sta	IN_YSPEEDLOW+7
+    409  6144		       ad d6 8e 	      lda	UDP_DATA_IN+80
+    410  6147		       8d c2 31 	      sta	IN_YSPEEDHIGH+7
+    411  614a
+    412  614a		       ad d7 8e 	      lda	UDP_DATA_IN+81
+    413  614d		       8d 2e d0 	      sta	sprite8color
+    414  6150		       ad d8 8e 	      lda	UDP_DATA_IN+82
+    415  6153		       8d ff 07 	      sta	sprite8pnt
+    416  6156
+    417  6156							;now, calculate MSB for sprites
+    418  6156		       a9 00		      lda	#0
+    419  6158		       ae 88 8e 	      ldx	UDP_DATA_IN+2
+    420  615b		       8e cc 31 	      stx	IN_XPOSHIGH+1
+    421  615e		       f0 02		      beq	.ahead1
+    422  6160		       09 02		      ora	#2
+    423  6162				   .ahead1
+    424  6162		       ae 94 8e 	      ldx	UDP_DATA_IN+14
+    425  6165		       8e cd 31 	      stx	IN_XPOSHIGH+2
+    426  6168		       f0 02		      beq	.ahead2
+    427  616a		       09 04		      ora	#4
+    428  616c				   .ahead2
+    429  616c		       ae a0 8e 	      ldx	UDP_DATA_IN+26
+    430  616f		       8e ce 31 	      stx	IN_XPOSHIGH+3
+    431  6172		       f0 02		      beq	.ahead3
+    432  6174		       09 08		      ora	#8
+    433  6176				   .ahead3
+    434  6176		       ae ac 8e 	      ldx	UDP_DATA_IN+38
+    435  6179		       8e cf 31 	      stx	IN_XPOSHIGH+4
+    436  617c		       f0 02		      beq	.ahead4
+    437  617e		       09 10		      ora	#16
+    438  6180				   .ahead4
+    439  6180		       ae b8 8e 	      ldx	UDP_DATA_IN+50
+    440  6183		       8e d0 31 	      stx	IN_XPOSHIGH+5
+    441  6186		       f0 02		      beq	.ahead5
+    442  6188		       09 20		      ora	#32
+    443  618a				   .ahead5
+    444  618a		       ae c4 8e 	      ldx	UDP_DATA_IN+62
+    445  618d		       8e d1 31 	      stx	IN_XPOSHIGH+6
+    446  6190		       f0 02		      beq	.ahead6
+    447  6192		       09 40		      ora	#64
+    448  6194				   .ahead6
+    449  6194		       ae d0 8e 	      ldx	UDP_DATA_IN+74
+    450  6197		       8e d2 31 	      stx	IN_XPOSHIGH+7
+    451  619a		       f0 02		      beq	.ahead7
+    452  619c		       09 80		      ora	#128
+    453  619e				   .ahead7
+    454  619e							;sta .self+1
+    455  619e							;lda $d010
+    456  619e							;and #1
+    457  619e							;.self
+    458  619e							;ora #$ff ;self-mod!
+    459  619e							;sta $d010
+    460  619e		       8d db 31 	      sta	IN_XPOS_D010
+    461  61a1
+    462  61a1							;--------------------------------------
+    463  61a1				   MYUDP_PROCESS_x
+    464  61a1		       a9 01		      lda	#$01
+    465  61a3		       8d 59 5e 	      sta	PACKET_RECEIVED
+    466  61a6		       60		      rts
+    467  61a7
     468  61a7
-    469  61a7
-    470  61a7							; -------------------------------------------------------------------------
-    471  61a7							; Do Checksum here
-    472  61a7				   CHECKSUM
-    473  61a7							; lda INPACKET+????   ; A now holds the checksum we received
-    474  61a7							; sta RCV_CSUM
-    475  61a7
-    476  61a7							;Point x:a to start of received packet
-    477  61a7							;and calculate our own checksum
-    478  61a7		       a2 86		      ldx	#<(INPACKET+$2A)
-    479  61a9		       a9 8e		      lda	#>(INPACKET+$2A)
-    480  61ab		       88		      dey		; So we aren't including the checksum byte itself
-    481  61ac							; jsr DATACHECKSUM
-    482  61ac
-    483  61ac		       ad 78 5d 	      lda	CSUM
-    484  61af							;sta CSUM_SAVE
-    485  61af
-    486  61af		       ad d3 5f 	      lda	RCV_CSUM
-    487  61b2		       cd 78 5d 	      cmp	CSUM
-    488  61b5							; Zero bit now contains whether or not checksum matches, use bne/beq
-    489  61b5		       60		      rts
+    469  61a7							; -------------------------------------------------------------------------
+    470  61a7							; Do Checksum here
+    471  61a7				   CHECKSUM
+    472  61a7							; lda INPACKET+????   ; A now holds the checksum we received
+    473  61a7							; sta RCV_CSUM
+    474  61a7
+    475  61a7							;Point x:a to start of received packet
+    476  61a7							;and calculate our own checksum
+    477  61a7		       a2 86		      ldx	#<(INPACKET+$2A)
+    478  61a9		       a9 8e		      lda	#>(INPACKET+$2A)
+    479  61ab		       88		      dey		; So we aren't including the checksum byte itself
+    480  61ac							; jsr DATACHECKSUM
+    481  61ac
+    482  61ac		       ad 78 5d 	      lda	CSUM
+    483  61af							;sta CSUM_SAVE
+    484  61af
+    485  61af		       ad d3 5f 	      lda	RCV_CSUM
+    486  61b2		       cd 78 5d 	      cmp	CSUM
+    487  61b5							; Zero bit now contains whether or not checksum matches, use bne/beq
+    488  61b5		       60		      rts
 ------- FILE racer-main.asm
 ------- FILE SIXNET.ASM LEVEL 2 PASS 2
       0  61b6					      include	"SIXNET.ASM"	; Must always be last so buffer is at end!
